@@ -365,8 +365,15 @@ PopExtAttributes.Attrs <- {
 		}
 
 		// A. BUILD HOOK: Track new buildings
-		local build_hook = format("MultiBuild_Built_%d", player_id)
+		local build_hook = format("ExtraBuildings_%d_Built", player_id)
 		POP_EVENT_HOOK("player_builtobject", build_hook, function(params) {
+			// Defensive check for lingering hooks
+			if ( !player || !player.IsValid() || !("MultiBuild" in player.GetScriptScope()) )
+			{
+				POP_EVENT_HOOK("player_builtobject", build_hook, null, EVENT_WRAPPER_CUSTOMATTR);
+				return;
+			}
+
 			local builder = GetPlayerFromUserID(params.userid)
 			if (builder != player) return
 			
@@ -404,8 +411,15 @@ PopExtAttributes.Attrs <- {
 		}, EVENT_WRAPPER_CUSTOMATTR)
 
 		// B. DESTROY HOOK: Cleanup tracking (FIXED for robustness)
-		local destroy_hook = format("MultiBuild_Destroy_%d", player_id)
+		local destroy_hook = format("ExtraBuildings_%d_Destroy", player_id)
 		POP_EVENT_HOOK("object_destroyed", destroy_hook, function(params) {
+			// Defensive check for lingering hooks
+			if ( !player || !player.IsValid() || !("MultiBuild" in player.GetScriptScope()) )
+			{
+				POP_EVENT_HOOK("object_destroyed", destroy_hook, null, EVENT_WRAPPER_CUSTOMATTR);
+				return;
+			}
+
 			// We iterate our stored lists and check against the destroyed index
 			// This is safer than relying on EntIndexToHScript returning a valid object for a dying entity
 			local destroyed_idx = params.index
@@ -424,8 +438,15 @@ PopExtAttributes.Attrs <- {
 		}, EVENT_WRAPPER_CUSTOMATTR)
 
 		// C. CARRY HOOK: Restore type when picked up
-		local carry_hook = format("MultiBuild_Carry_%d", player_id)
+		local carry_hook = format("ExtraBuildings_%d_Carry", player_id)
 		POP_EVENT_HOOK("player_carryobject", carry_hook, function(params) {
+			// Defensive check for lingering hooks
+			if ( !player || !player.IsValid() || !("MultiBuild" in player.GetScriptScope()) )
+			{
+				POP_EVENT_HOOK("player_carryobject", carry_hook, null, EVENT_WRAPPER_CUSTOMATTR);
+				return;
+			}
+			
 			local carrier = GetPlayerFromUserID(params.userid)
 			if (carrier != player) return
 			
@@ -574,9 +595,16 @@ PopExtAttributes.Attrs <- {
 		}
 
 		// HOOKS
-		local hook_name = format("CustomBuildingHealth_%d", player_id)
+		local built_hook_name = format("CustomBuildingHealth_%d_built", player_id)
+		local upgraded_hook_name = format("CustomBuildingHealth_%d_upgraded", player_id)
+		local quick_sentry_hook_name = format("CustomBuildingHealth_%d_quicksentry", player_id)
 
-		POP_EVENT_HOOK("player_builtobject", hook_name, function(params) {
+		POP_EVENT_HOOK("player_builtobject", built_hook_name, function(params) {
+			if ( !player || !player.IsValid() || !("CustomBuildingHealth" in player.GetScriptScope()) )
+			{
+				POP_EVENT_HOOK("player_builtobject", built_hook_name, null, EVENT_WRAPPER_CUSTOMATTR);
+				return;
+			}
 			local builder = GetPlayerFromUserID(params.userid)
 			if (builder != player) return
 			
@@ -584,7 +612,12 @@ PopExtAttributes.Attrs <- {
 			ApplyHealthMod(building)
 		}, EVENT_WRAPPER_CUSTOMATTR)
 
-		POP_EVENT_HOOK("player_upgradedobject", hook_name, function(params) {
+		POP_EVENT_HOOK("player_upgradedobject", upgraded_hook_name, function(params) {
+			if ( !player || !player.IsValid() || !("CustomBuildingHealth" in player.GetScriptScope()) )
+			{
+				POP_EVENT_HOOK("player_upgradedobject", upgraded_hook_name, null, EVENT_WRAPPER_CUSTOMATTR);
+				return;
+			}
 			local upgrader = GetPlayerFromUserID(params.userid)
 			if (upgrader != player) return
 			
@@ -592,7 +625,12 @@ PopExtAttributes.Attrs <- {
 			ApplyHealthMod(building)
 		}, EVENT_WRAPPER_CUSTOMATTR)
 		
-		POP_EVENT_HOOK( "mvm_quick_sentry_upgrade", hook_name, function( params ) {
+		POP_EVENT_HOOK( "mvm_quick_sentry_upgrade", quick_sentry_hook_name, function( params ) {
+			if ( !player || !player.IsValid() || !("CustomBuildingHealth" in player.GetScriptScope()) )
+			{
+				POP_EVENT_HOOK("mvm_quick_sentry_upgrade", quick_sentry_hook_name, null, EVENT_WRAPPER_CUSTOMATTR);
+				return;
+			}
 			for ( local sentry; sentry = FindByClassname( sentry, "obj_sentrygun" ); ) {
 				if ( GetPropEntity( sentry, "m_hBuilder" ) == player ) {
 					ApplyHealthMod(sentry)
