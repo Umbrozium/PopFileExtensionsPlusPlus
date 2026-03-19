@@ -74,6 +74,7 @@ PopExtAttributes.Descs <- {
 	"dmg bonus while half dead" 	: "%d⁒ damage bonus while half dead",
 	"dmg penalty while half alive"  : "%d⁒ damage penalty while half alive",
 	"extra buildings"				: "The logic of this attribute is a bit too big for a single value of %d.",
+	"custom building health"		: "Modifies building health by a multiplier. E.g. [ [\"sentry\", 0.5], [\"dispenser\", 1.2] ]",
 }
 
 PopExtAttributes.Attrs <- {
@@ -495,6 +496,109 @@ PopExtAttributes.Attrs <- {
 		}
 		
 		PopExtUtil.AddThink(player, mb_think)
+	}
+
+	function CustomBuildingHealth( player, item, value ) {
+
+		if ( !player || !player.IsValid() ) return
+
+		local scope = player.GetScriptScope()
+		if ( !("CustomBuildingHealth" in scope) ) {
+			scope.CustomBuildingHealth <- {
+				Config = {},
+				Initialized = false
+			}
+		}
+
+		// 1. PARSE CONFIG
+		if ( typeof value == "array" ) {
+			foreach ( entry in value ) {
+				if ( typeof entry != "array" || entry.len() < 2 ) continue
+				
+				local type_str = entry[0].tolower()
+				local mult = entry[1].tofloat()
+				
+				scope.CustomBuildingHealth.Config[type_str] <- mult
+			}
+		}
+
+		// 2. INITIALIZE LOGIC ONCE
+		if ( scope.CustomBuildingHealth.Initialized ) return
+		scope.CustomBuildingHealth.Initialized = true
+
+		local player_id = PopExtUtil.PlayerTable[player]
+
+		local function ApplyHealthMod( building ) {
+			if ( !building || !building.IsValid() ) return
+
+			local builder = GetPropEntity( building, "m_hBuilder" )
+			if ( builder != player ) return
+
+			local config = player.GetScriptScope().CustomBuildingHealth.Config
+			
+			local obj_type_id = GetPropInt( building, "m_iObjectType" )
+			local building_type_str = ""
+			
+			switch(obj_type_id) {
+				case 0: // OBJ_DISPENSER
+					building_type_str = "dispenser"
+					break
+				case 1: // OBJ_TELEPORTER
+					// Based on ExtraBuildings attribute: m_iTeleportType is 1 for entrance, 0 for exit.
+					if (GetPropInt(building, "m_iTeleportType") == 1) {
+						building_type_str = "teleporter_entrance"
+					} else {
+						building_type_str = "teleporter_exit"
+					}
+					break
+				case 2: // OBJ_SENTRYGUN
+					building_type_str = "sentry"
+					break
+			}
+
+			local mult = null
+			if (building_type_str in config) {
+				mult = config[building_type_str]
+			} else if (building_type_str.find("teleporter") != null && "teleporter" in config) {
+				mult = config.teleporter
+			}
+
+			if (mult != null) {
+				PopExtUtil.ScriptEntFireSafe( building, format(@"
+					local maxhealth = self.GetMaxHealth() * %f
+					self.SetMaxHealth( maxhealth )
+					if ( self.GetHealth() > self.GetMaxHealth() )
+						self.SetHealth( maxhealth )
+				", mult), SINGLE_TICK ) // Use SINGLE_TICK to apply after the object is initialized.
+			}
+		}
+
+		// HOOKS
+		local hook_name = format("CustomBuildingHealth_%d", player_id)
+
+		POP_EVENT_HOOK("player_builtobject", hook_name, function(params) {
+			local builder = GetPlayerFromUserID(params.userid)
+			if (builder != player) return
+			
+			local building = EntIndexToHScript(params.index)
+			ApplyHealthMod(building)
+		}, EVENT_WRAPPER_CUSTOMATTR)
+
+		POP_EVENT_HOOK("player_upgradedobject", hook_name, function(params) {
+			local upgrader = GetPlayerFromUserID(params.userid)
+			if (upgrader != player) return
+			
+			local building = EntIndexToHScript(params.index)
+			ApplyHealthMod(building)
+		}, EVENT_WRAPPER_CUSTOMATTR)
+		
+		POP_EVENT_HOOK( "mvm_quick_sentry_upgrade", hook_name, function( params ) {
+			for ( local sentry; sentry = FindByClassname( sentry, "obj_sentrygun" ); ) {
+				if ( GetPropEntity( sentry, "m_hBuilder" ) == player ) {
+					ApplyHealthMod(sentry)
+				}
+			}
+		}, EVENT_WRAPPER_CUSTOMATTR )
 	}
 	
 	function SelfAddCondOnHit( player, item, value ) {

@@ -39,7 +39,9 @@
 							"extra buildings" : [
 								["sentry", 2]
 							],
-							"engy building health bonus" : 0.33,
+							"custom building health" : [
+								["sentry", 0.33]
+							]
 						}
 					}
 					SoundLoop = {
