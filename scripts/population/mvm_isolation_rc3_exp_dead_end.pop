@@ -1,0 +1,2217 @@
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_gatebot.pop
+Coldfront_Calamity // Made by 7tury frfr mane
+{
+	StartingCurrency	0
+	RespawnWaveTime	5
+	CanBotsAttackWhileInSpawnRoom	No
+	AddSentryBusterWhenKillCountExceeds 15
+	AddSentryBusterWhenDamageDealtExceeds 1400
+	Advanced	1
+	Templates
+	{
+		T_TFBot_Soldier_Mangler
+		{
+			Class Soldier
+			Name "Mangler Soldier"
+			Skill Normal
+			Attributes Aggressive
+			Attributes HoldFireUntilFullReload
+			ClassIcon soldier_mangler
+			WeaponRestrictions PrimaryOnly
+			Item "The Cow Mangler 5000"
+			Item "The Buff Banner"
+			ItemAttributes
+			{
+				ItemName "The Buff Banner"
+				"increase buff duration" 10
+			}
+		}
+		T_TFBot_Soldier_Megaboss
+		{
+			Name "The Airborne Regent"
+			Class Soldier
+			Health 60000
+			Skill Expert
+			ClassIcon soldier_nuker
+			Scale 2
+			WeaponRestrictions PrimaryOnly
+			BehaviorModifiers Mobber
+			Attributes UseBossHealthBar
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Attributes Parachute
+			Attributes IgnoreFlag
+			Attributes AutoJump
+				AutoJumpMin 5
+				AutoJumpMax 5
+			Item "The Air Strike"
+			Item "The Crack Pot"
+			Item "eotl_winter_coat"
+                        Item "the b.a.s.e. jumper"
+			ItemAttributes
+			{
+				ItemName "The Air Strike"
+				"damage bonus" 7.5
+				"clip size bonus" 10
+				"fire rate bonus" 0.1
+				"faster reload rate" 0.1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.6
+				"increased jump height" 5
+				"airblast vulnerability multiplier" 0.5
+				"airblast vertical vulnerability multiplier" 0.5
+				"damage force reduction" 0.5
+				"cancel falling damage" 1
+				"parachute attribute" 1
+				"bot custom jump particle" 1
+				"air jump on attack" 1
+
+			}
+		}
+		T_TFBot_Soldier_Fast
+		{
+			Class Soldier
+			Name "Fast Soldier"
+			Skill Hard
+			ClassIcon soldier_escape
+			WeaponRestrictions MeleeOnly
+			Item "The Escape Plan"
+			CharacterAttributes
+			{
+				"move speed bonus" 1.5
+			}
+		}
+		T_TFBot_Demo_Cluster
+		{
+			Class Demoman
+			Name "Cluster Bomber"
+			Skill Normal
+			ClassIcon demo_clusterbomb
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Item "The Iron Bomber"
+			Item "Glengarry Bonnet"
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"auto fires full clip all at once" 1
+				"projectile spread angle penalty" 5
+				"fuse bonus" 0.5
+			}
+		}
+		T_TFBot_Scout_The_OP_Gunbai
+		{
+			Class Scout
+			Name "Markus, The Baneful"
+			Skill Hard
+			Health 18000
+			Attributes UseBossHealthBar
+			Attributes MiniBoss
+			Attributes Aggressive
+			BehaviorModifiers Push
+			BehaviorModifiers Mobber
+			WeaponRestrictions MeleeOnly
+			ClassIcon scout_fanowar_giant
+			Item "Fast Learner"
+			Item "The Fan O'War"
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+			}
+			ItemAttributes
+			{
+				ItemName "The Fan O'War"
+				"melee attack rate bonus" 0.60
+				"melee range multiplier" 2
+				"damage bonus" 3
+				"bleeding duration" 10
+				"slow enemy on hit" 100
+				"killstreak tier" 2
+				"killstreak idleeffect" 3
+			}		
+		}
+		T_TFBot_Scout_Cleaver
+		{
+			Class Scout
+			Name "Butcher Scout"
+			Skill Hard
+			Item "The Flying Guillotine"
+			Item "The Face Plante"
+			WeaponRestrictions SecondaryOnly
+			ClassIcon scout_cleaver
+			ItemAttributes
+			{
+				ItemName "The Flying Guillotine"
+				"effect bar recharge rate increased" 0.5
+			}
+		}
+		T_TFBot_Giant_Medic_Shield
+		{
+			Class Medic
+			Name "Giant Shield Medic"
+			ClassIcon medic_shield_qf_giant
+			Skill Expert
+			Health 4500
+			Item "The Quick-Fix"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			Attributes ProjectileShield
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"ubercharge rate bonus" 0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"heal rate bonus" 50
+			}
+		}
+		T_TFBot_Soldier_Shogun
+		{
+			Class Soldier
+			Name "Shogun Soldier"
+			ClassIcon soldier_shogun
+			Skill Hard
+			Attributes SpawnWithFullCharge
+			Item "The Concheror"
+			Item "The Half-Zatoichi"
+			WeaponRestrictions MeleeOnly
+			ItemAttributes
+			{
+				ItemName "The Concheror"
+				"increase buff duration" 3
+			}
+			ItemAttributes
+			{
+				ItemName "The Half-Zatoichi"
+				"restore health on kill" 60
+				"honorbound" 0
+			}
+		}
+		T_TFBot_Giant_Medic_Kritz
+		{
+			Class Medic
+			Name "Giant Kritz Medic"
+			ClassIcon medic_kritz_giant
+			Skill Expert
+			Health 4500
+			Attributes SpawnWithFullCharge
+			Item "The Kritzkrieg"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"heal rate bonus" 200
+				"bot medic uber health threshold" 2000
+			}
+		}
+		T_TFBot_Giant_Medic_Vaccinator
+		{
+			Class Medic
+			Skill Expert
+			Health 4500
+			Attributes SpawnWithFullCharge
+			Item "The Vaccinator"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"heal rate bonus" 200
+			}
+		}
+		T_TFBot_Pyro_Dragon_Giant
+		{
+			Class Pyro
+			Name "Giant Fireburst Pyro"
+			Skill Hard
+			Attributes MiniBoss
+			Health 3200
+			WeaponRestrictions PrimaryOnly
+			ClassIcon pyro_dragon_fury
+			Item "The Dragon's Fury"
+			CharacterAttributes
+			{
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 5
+				"move speed bonus" 0.5
+			}
+		}
+		T_TFBot_Pyro_Dragon
+		{
+			Class Pyro
+			Name "Fireburst Pyro"
+			Skill Hard
+			Health 175
+			WeaponRestrictions PrimaryOnly
+			ClassIcon pyro_dragon_fury
+			Item "The Dragon's Fury"
+		}
+		Orbital_Cannon
+		{
+			ClassIcon	boss_hardhead
+			Health	1000000
+			Name	"Orbital Strike Cannon"
+			Scale	2
+			Class	Soldier
+			Skill	Expert
+			WeaponRestrictions	PrimaryOnly
+			Attributes	MiniBoss
+			Attributes	HoldFireUntilFullReload
+			Attributes	AlwaysCrit
+			Attributes	IgnoreFlag
+			Attributes	AlwaysFireWeapon
+			MaxVisionRange 1000000
+			Item	"concealedkiller_rocketlauncher_woodlandwarrior"
+			Item "The B.M.O.C."
+			Item	"pass time miniature half jack"
+			ItemAttributes
+			{
+				ItemName	concealedkiller_rocketlauncher_woodlandwarrior
+				"damage bonus"	200.0
+				"fire rate bonus"	-1
+				"clip size upgrade atomic"	30.0
+				"faster reload rate" 0.1
+				"Blast radius increased"	4.0
+				"use large smoke explosion"	1
+				"Projectile range increased"	20.00
+				"projectile spread angle penalty"	2
+				"Projectile speed increased"	0.5
+				"centerfire projectile" 1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	1
+				"damage force reduction"	0.1
+				"airblast vulnerability multiplier"	0.1
+				"override footstep sound set"	3
+				"hand scale" 0
+			}
+		}
+	}
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// Load popextensions script
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				IncludeScript(`DeadEndInit.nut`, getroottable())
+				
+				PopExt.CustomTank(`abc*`, {
+
+                    Scale = `0.5`
+                    DisableSmoke = true
+					NoDeathFX = 2
+
+                    function OnSpawn(tank, name) {
+
+                        local prop = SpawnEntityFromTable(`prop_dynamic`, {model = `models/props_badlands/barrel01.mdl`, origin = `0 0 79`})
+                        local trigger = SpawnEntityFromTable(`trigger_ignite`, {origin = `0 0 100`, spawnflags = `1`})
+
+                        trigger.SetSize(Vector(-175,-175,-175), Vector(175,175,175))
+                        PopExtUtil.SetParentLocalOrigin([prop, trigger], tank)
+
+                        tank.KeyValueFromString(`rendercolor`, `255 0 0`)
+                    }
+                })
+			"
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w16verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting 4
+			Where	none
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			FirstSpawnOutput
+    			{
+        			Target BigNet
+        			Action RunScriptCode
+        			Param "
+							SoundLoop.Halt()
+							EntFire(`doorbutton_hit`, `enablecollision`)
+					"
+    			}
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w13verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting 6
+			Where	none
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w14verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting 8
+			Where	none
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w15verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			TFBot
+			{
+				Name "Heavy"
+				Class Heavyweapons
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+				Tag "popext_extraspawn{where = `spawnbot_ambush`}"
+			}
+		}
+		WaveSpawn
+        {
+            Name w3030dicelynone
+            TotalCount 1
+            TotalCurrency 0
+			WaitBeforeStarting 4
+            Tank
+            {
+                Health 100
+                Speed 75
+                Name "abcd"
+                StartingPathTrackNode "mytankpath1_1"
+
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+        }
+	}
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// Load popextensions script
+				IncludeScript(`popextensions_main.nut`, getroottable())		
+
+				IncludeScript(`mytemplates.nut`, getroottable())
+				
+				EntFire(`wave_init_relay`, `Trigger`)
+
+				PopExtUtil.SetConvar( `sv_skyname`, `sky_nightfall_01`)
+				
+				MissionAttrs({
+					WaveStartCountdown = 7
+					SoundLoop = {
+						Intermission = {
+							Order = `list`
+							`1` : {
+								Sound = `#solacedreams2.mp3`
+								Volume = 1
+								Duration = 128
+							}
+						}
+					}
+					NoUpgrades = `Clear out the rubble.`
+				})
+				SpawnTemplate(`UpgradeStationRubble`)
+				
+				EntFire(`rubble_hitbox`, `AddHealth`, `-99999875`)
+				
+				MissionAttributes.ResetPlayerVision()
+			"
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w12verycool
+			TotalCurrency	0
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	5
+			Where	spawnbot
+			// FirstSpawnWarningSound "mvm/mvm_tele_activate.wav"
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+				Tag "popext_extraspawn{where = `spawnbot_ambush`}"
+			}
+		}
+		WaveSpawn
+		{
+			Name	w12verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			// FirstSpawnWarningSound "mvm/mvm_tele_activate.wav"
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+				Tag "popext_extraspawn{where = `spawnbot_airborne`}"
+			}
+		}
+	}
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// Load popextensions script
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				
+				EntFire(`wave_init_relay`, `Trigger`)
+				
+				MissionAttrs({
+					ExtraUpgrades = {
+						ItemUpgrades = {
+							`The Gunslinger` : [
+								{
+									attr = `extra buildings`
+									value = [[`sentry`, `v`]]
+									name = `Build +1 additional sentry`
+									increment = [`v`, 1]
+									cap = 4
+									cost = 500
+								}
+							]
+						}
+					}
+				})
+			"
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w12verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			// FirstSpawnWarningSound "mvm/mvm_tele_activate.wav"
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+				Tag "popext_reprogrammed"
+				Tag "popext_extraspawn{where = `spawnbot_airborne`}"
+			}
+		}
+		WaveSpawn
+		{
+			Name	w12verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			// FirstSpawnWarningSound "mvm/mvm_tele_activate.wav"
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+				Tag "popext_extraspawn{where = `spawnbot_ambush`}"
+			}
+		}
+	}
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// Load popextensions script
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				
+				EntFire(`wave_init_relay`, `Trigger`)
+			"
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w0verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			FirstSpawnWarningSound "mvm/mvm_tele_activate.wav"
+			TFBot
+			{
+				Template T_TFBot_Scout_The_OP_Gunbai
+				Tag "popext_extraspawn{where = `spawnbot_ambush`, spawn_uber_duration = 3}"
+				Tag "popext_reprogrammed"
+				Tag "popext_alwaysglow"
+				Tag "popext_customattr{weapon = `tf_weapon_bat`, attr = `add cond on hit`, value = [27,1]}"
+				Tag "popext_stripslot{slot = SLOT_PRIMARY}"
+				Tag "popext_stripslot{slot = SLOT_SECONDARY}"
+			}
+		}
+		WaveSpawn
+		{
+			Name	w12verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot_invasion
+			FirstSpawnWarningSound "mvm/mvm_tele_activate.wav"
+			TFBot
+			{
+				Template T_TFBot_Soldier_Mangler
+				Name "Inverse Radiation Heat Seeker"
+				Health			20000
+				Skill			Expert
+				Attributes		MiniBoss
+				Attributes 		HoldFireUntilFullReload
+				ItemAttributes
+				{
+					ItemName "The Cow Mangler 5000"
+					"damage bonus"			10
+					"faster reload rate"		0.1
+					"energy weapon no deflect" 	200
+				}
+				CharacterAttributes
+				{
+					"override footstep sound set" 5
+					"healing mastery" 4
+				}
+
+				Tag "popext_extraspawn{where = `spawnbot_airborne`, spawn_uber_duration = 3}"
+				Tag "popext_reprogrammed"
+				Tag "popext_alwaysglow"
+				Tag "popext_customattr{weapon = `tf_weapon_particle_cannon`, attr = `self add cond on kill`, value = [73,5]}"
+				Tag "popext_homingprojectile{turn_power = 1.0, speed_mult = 1.0}"
+				Tag "popext_addcond{cond = TF_COND_OFFENSEBUFF}"
+				Tag "popext_stripslot{slot = SLOT_SECONDARY}"
+				Tag "popext_stripslot{slot = SLOT_MELEE}"
+				Tag "popext_altfire"
+				Tag "popext_mobber{threat_type = `closest`, threat_dist = 256.0, lookat = false, turnrate = 150}"
+			}
+		}
+		WaveSpawn
+		{
+			Name	w1
+			TotalCurrency	140
+			TotalCount	20
+			MaxActive	5
+			SpawnCount	5
+			Where	spawnbot_invasion
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Name "Demoman"
+					Class Demoman
+					Health 175
+					Skill Hard
+					WeaponRestrictions PrimaryOnly
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Name "Pyro"
+					Class Pyro
+					Health 175
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w2
+			TotalCurrency	250
+			TotalCount	2
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot_giant_house
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Crit
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w3
+			TotalCurrency	140
+			TotalCount	20
+			MaxActive	5
+			SpawnCount	5
+			WaitForAllDead w2
+			Where	spawnbot_invasion_house
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Name "Heavyweapons"
+					Class HeavyWeapons
+					Health 300
+					Skill Hard
+					WeaponRestrictions PrimaryOnly
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Name "Pyro"
+					Class Pyro
+					Health 175
+					Skill Hard
+					WeaponRestrictions PrimaryOnly
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w4
+			TotalCurrency	165
+			TotalCount	2
+			MaxActive	1
+			SpawnCount	1
+			WaitForAllDead w2
+			Where	spawnbot_giant
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro_Flare_Spammer
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w5
+			TotalCurrency 0
+			Support 1
+			MaxActive 5
+			SpawnCount 5
+			Where	spawnbot_invasion
+			TFBot
+			{
+				Name "Gunbai Scout"
+				ClassIcon scout_fanowar
+				Class Scout
+				Health 125
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				Item "The Fan O'War"
+				Item "The B.M.O.C."
+			}
+		}
+	}
+	Mission
+	{
+		Objective Sniper
+		Where Behind
+		InitialCooldown 25
+		CooldownTime 30
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		DesiredCount 4
+		TFBot
+		{
+			Template T_TFBot_Sniper_Sydney_Sleeper
+			Item "Darwin's Danger Shield"
+			Item "The B.M.O.C."
+		}
+	}
+	Mission
+	{
+		Objective Engineer
+		Where Anywhere
+		InitialCooldown 25
+		CooldownTime 30
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		DesiredCount 1
+		TFBot
+		{
+			Template T_TFBot_Engineer_Sentry_Teleporter
+			Item "The B.M.O.C."
+		}
+	}
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w1
+			TotalCurrency	130
+			TotalCount	28
+			MaxActive	4
+			SpawnCount	4
+			Where	spawnbot_invasion
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template T_TFBot_Soldier_Extended_Buff_Banner
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w2
+			TotalCurrency	230
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	2
+			WaitBetweenSpawnsAfterDeath 7
+			Where	spawnbot_giant
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template T_TFBot_Pyro_Dragon_Giant
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Kritz
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w2
+			TotalCurrency	230
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	2
+			WaitBetweenSpawnsAfterDeath 7
+			Where	spawnbot_giant
+			TFBot
+			{
+				Template T_TFBot_Giant_Demo_RapidFire
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w3
+			TotalCurrency	60
+			TotalCount	20
+			MaxActive	10
+			SpawnCount	10
+			WaitForAllDead w1
+			Where	spawnbot_house
+			TFBot
+			{
+				Template T_TFBot_Demoman_Knight
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w4
+			TotalCurrency	60
+			TotalCount	14
+			MaxActive	7
+			SpawnCount	7
+			WaitForAllDead w1
+			Where	spawnbot_house
+			TFBot
+			{
+				Template T_TFBot_Soldier_Extended_Buff_Banner
+				Item "The B.M.O.C."
+			}
+		}
+	}
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w1
+			TotalCurrency	230
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	2
+			Where	spawnbot_giant_house
+			WaitBeforeStarting 2
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_SlowBarrage
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+					Item "The B.M.O.C."
+					Name "Giant Regen Medic"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w2
+			TotalCurrency	80
+			TotalCount	15
+			MaxActive	3
+			SpawnCount	3
+			Where	spawnbot_invasion
+			WaitBeforeStarting 1
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template T_TFBot_ScorchShot
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_SunStick
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_SunStick
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w3
+			TotalCurrency	80
+			TotalCount	15
+			MaxActive	3
+			SpawnCount	3
+			WaitForAllDead w1
+			Where	spawnbot_invasion_house
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template T_TFBot_ScorchShot
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_SunStick
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w4
+			TotalCurrency	80
+			TotalCount	20
+			MaxActive	4
+			SpawnCount	4
+			WaitForAllDead w1
+			Where	spawnbot_invasion
+			TFBot
+			{
+				Template T_TFBot_Demo_Cluster
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w4
+			TotalCurrency	80
+			TotalCount	12
+			MaxActive	4
+			SpawnCount	4
+			WaitForAllDead w1
+			Where	spawnbot_house
+			TFBot
+			{
+				Template T_TFBot_Soldier_RocketShotgun
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w5
+			TotalCurrency	230
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitForAllDead w1
+			Tank
+			{
+				Health 16000
+				Speed 75.0
+				Name Onetankyboi
+				StartingPathTrackNode tank_path_a_1
+				OnBombDroppedOutput
+				{
+				Target boss_deploy_relay
+				Action Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w6
+			TotalCurrency	230
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitForAllDead w1
+			WaitBeforeStarting 5
+			Tank
+			{
+				Health 16000
+				Speed 75.0
+				Name Onetankyboi
+				StartingPathTrackNode tank_path_b_1
+				OnBombDroppedOutput
+				{
+				Target boss_deploy_relay
+				Action Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w7
+			TotalCurrency	160
+			TotalCount	4
+			MaxActive	1
+			SpawnCount	1
+			WaitForAllDead w1
+			WaitBetweenSpawnsAfterDeath 5
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_FAN
+			}
+		}
+		WaveSpawn
+		{
+			Name	w8
+			TotalCurrency 0
+			Support 1
+			MaxActive 5
+			SpawnCount 5
+			Where	spawnbot_invasion_house
+			TFBot
+			{
+				Name "Gunbai Scout"
+				ClassIcon scout_fanowar
+				Class Scout
+				Health 175
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				Item "The Fan O'War"
+				Item "The B.M.O.C."
+			}
+		}
+	}
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w1
+			TotalCurrency 0
+			Support 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBetweenSpawnsAfterDeath 30
+			Where	spawnbot_giant_house
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Fast
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	s1
+			TotalCurrency 0
+			Support 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBetweenSpawnsAfterDeath 30
+			Where	spawnbot_giant_house
+			TFBot
+			{
+				Template T_TFBot_Soldier_Fast
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w2
+			TotalCurrency 225
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 1
+			Where	spawnbot_giant
+			Squad
+			{
+				ShouldPreserveSquad 1
+				
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_BrassBeast
+					ClassIcon heavy_brassbeast
+					Item "The B.M.O.C."
+					ItemAttributes
+					{
+						ItemName "The Brass Beast"
+						"slow enemy on hit" 0.5
+					}
+				}	
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Vaccinator
+					Name "Giant Blastshield Medic"
+					ClassIcon medic_blast
+					Attributes VaccinatorBlast
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w3
+			TotalCurrency 225
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			Where	spawnbot_giant_house
+			WaitForAllDead w2
+			Squad
+			{
+				ShouldPreserveSquad 1
+				
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_BrassBeast
+					ClassIcon heavy_brassbeast
+					Item "The B.M.O.C."
+					ItemAttributes
+					{
+						ItemName "The Brass Beast"
+						"slow enemy on hit" 0.5
+					}
+				}	
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Vaccinator
+					Name "Giant Fireshield Medic"
+					ClassIcon medic_fire
+					Attributes VaccinatorFire
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w4
+			TotalCurrency 225
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			Where	spawnbot_giant
+			WaitForAllDead w3
+			Squad
+			{
+				ShouldPreserveSquad 1
+				
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_BrassBeast
+					ClassIcon heavy_brassbeast
+					Item "The B.M.O.C."
+					ItemAttributes
+					{
+						ItemName "The Brass Beast"
+						"slow enemy on hit" 0.5
+					}
+				}	
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Vaccinator
+					Name "Giant Bulletshield Medic"
+					ClassIcon medic_bullet
+					Attributes VaccinatorBullets
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w5
+			TotalCurrency 320
+			TotalCount 40
+			MaxActive 8
+			SpawnCount 8
+			Where	spawnbot_invasion
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template T_TFBot_Sniper_Huntsman_Spammer
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Class Engineer
+					Name "Shotgun Engineer"
+					Skill Expert
+					Attributes Aggressive
+					BehaviorModifiers Push
+					WeaponRestrictions PrimaryOnly
+					ClassIcon shotgun_nys
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w6
+			TotalCurrency 150
+			TotalCount 26
+			MaxActive 7
+			SpawnCount 7
+			Where	spawnbot_invasion_house
+			WaitForAllDead w4
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template T_TFBot_Pyro_Dragon
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Dragon
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Dragon
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Dragon
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_SunStick
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_SunStick
+					Item "The B.M.O.C."
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_SunStick
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w7
+			TotalCurrency 120
+			TotalCount 12
+			MaxActive 3
+			SpawnCount 3
+			Where	spawnbot_invasion
+			TFBot
+			{
+				Template T_TFBot_Soldier_RocketPush
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w8
+			TotalCurrency 230
+			TotalCount 4
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead w4
+			Where	spawnbot_giant_house
+			TFBot
+			{
+				Template T_TFBot_Giant_DemoMan_PrinceTavish
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w9
+			TotalCurrency 120
+			TotalCount 15
+			MaxActive 5
+			SpawnCount 5
+			WaitForAllDead w4
+			Where	spawnbot_house
+			TFBot
+			{
+				Template T_TFBot_Scout_Sandman_FastCharge
+				Item "The B.M.O.C."
+			}
+		}
+	}
+	Mission
+	{
+		Objective Sniper
+		Where spawnbot_invasion
+		InitialCooldown 25
+		CooldownTime 30
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		DesiredCount 4
+		TFBot
+		{
+			Template T_TFBot_Soldier_Mangler
+		}
+	}
+	Mission
+	{
+		Objective Sniper
+		Where Behind
+		InitialCooldown 20
+		CooldownTime 20
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		DesiredCount 4
+		TFBot
+		{
+			Template T_TFBot_Sniper_Sydney_Sleeper
+		}
+	}
+	Mission
+	{
+		Objective Spy
+		Where Behind
+		InitialCooldown 20
+		CooldownTime 20
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		DesiredCount 4
+		TFBot
+		{
+			Template T_TFBot_Spy
+		}
+	}
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// Load popextensions script
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				
+				EntFire(`wave_init_relay`, `Trigger`)
+				
+				MissionAttrs({
+					HoldFireUntilFullReloadFix = 1
+					ExtraSpawnPoints = {
+                				spawnbot_red_courtyard = {
+                    				TeamNum = 2
+                    				Persistent = -1
+                    					Locations = {
+                        					`1` : `-1258.063721 2171.154053 36.031319`
+                    					}
+                				}
+					}
+				})
+			"
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w7
+			TotalCurrency 450
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead w5
+			WaitBeforeStarting 7
+			Where	spawnbot_giant
+			TFBot
+			{
+				Template T_TFBot_Scout_The_OP_Gunbai
+				Item "The B.M.O.C."
+				Attributes IgnoreFlag
+			}
+		}
+		WaveSpawn
+		{
+			Name	w1
+			TotalCurrency 375
+			TotalCount 6
+			MaxActive 2
+			SpawnCount 2
+			Where	spawnbot_giant_house
+			Squad
+			{
+				ShouldPreserveSquad 1
+				FormationSize 0.1
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_Shotgun
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Kritz
+					Item "The B.M.O.C."
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	w2
+			TotalCurrency 340
+			TotalCount 27
+			MaxActive 3
+			SpawnCount 3
+			Where	spawnbot_invasion
+			WaitForAllDead w3
+			DoneOutput
+			{
+				Target	wave_finished_relay
+				Action	Trigger
+			}	
+			TFBot
+			{
+				Template T_TFBot_Demoman_Samurai
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w3
+			TotalCurrency 230
+			TotalCount 30
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 2
+			Where	spawnbot_house
+			TFBot
+			{
+				Template T_TFBot_Scout_Cleaver
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w4
+			TotalCurrency 340
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead w3
+			Where	spawnbot_giant
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer_Reload
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w5
+			TotalCurrency 100
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 5
+			WaitForAllDead w3
+			Where	spawnbot_house
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heavyweight_Champ
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w6
+			TotalCurrency 100
+			TotalCount 24
+			MaxActive 4
+			SpawnCount 4
+			WaitForAllDead w3
+			Where	spawnbot_invasion
+			TFBot
+			{
+				Template T_TFBot_ScorchShot_FastShot
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w6
+			Support 2019
+			MaxActive 4
+			SpawnCount 4
+			WaitForAllDead w3
+			Where	spawnbot_invasion_house
+			TFBot
+			{
+				Template T_TFBot_Soldier_Fast
+				Item "The B.M.O.C."
+			}
+		}
+	}
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// Load popextensions script
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				
+				EntFire(`wave_init_relay`, `Trigger`)
+								
+				::SimplePlay <- function( value ) {
+					PrecacheScriptSound( value )
+					PrecacheSound( value )
+					local max = MaxClients().tointeger()
+					for (local i = 1; i <= max; i++) {
+						local p = PlayerInstanceFromIndex(i)
+						
+						if (p && p.IsValid()) {
+							EmitSoundEx({
+								sound_name = value,
+								entity = p,
+								channel = 6,
+								sound_level = 0,
+								volume = 1.0,
+								flags = 0
+							})
+						}
+					}
+				}
+				
+				function Detonation() {
+					EntFire(`boss_deploy_relay`, `Trigger`)
+				}
+				
+				MissionAttrs({
+					WaveStartCountdown = 7
+					SoundLoop = {
+						Wave = {
+							Order = `list`
+							`1` : {
+								Sound = `#reflections_of_violence.mp3`
+								Volume = 1
+								Duration = 305
+							}
+						}
+					}
+				})
+			"
+		}
+		StartWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// Load popextensions script
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				
+				EntFire(`wave_start_relay`, `Trigger`)
+				
+				MissionAttrs({
+					Timer = {
+						Style = [`Clock`, `game_text`, `-1 0.25`]
+						Minutes = 5
+						End = {
+							Action = Detonation
+						}
+					}
+				})
+				
+				ClientPrint( null, HUD_PRINTCENTER, `THE MOTHERSHIP HAS ACTIVATED THE EMERGENCY WARHEAD.` )
+				PopExtUtil.RunWithDelay(2, function() { ClientPrint( null, 4, `THE MOTHERSHIP HAS ACTIVATED THE EMERGENCY WARHEAD.`) })
+				PopExtUtil.RunWithDelay(6, function() { ClientPrint( null, 4, `THE LAST CHAMPION HAS ARRIVED TO PREVENT YOUR ESCAPE.`) })
+				PopExtUtil.RunWithDelay(10, function() { ClientPrint( null, 4, `GIVE A WARM WELCOME TO...`) })
+				PopExtUtil.RunWithDelay(14, function() { ClientPrint( null, 4, `T H E  A I R B O R N E  R E G E N T .`) })
+				PopExtUtil.RunWithDelay(14, function() { ::SimplePlay(`Soldier.M_MVM_LaughEvil02`) })
+			"
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Name	w1
+			TotalCurrency 9999
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Where spawnbot_giant_house
+			TFBot
+			{
+				Template T_TFBot_Soldier_Megaboss
+			}
+		}
+		WaveSpawn
+		{
+			Name timer2
+			TotalCurrency 0
+			Support limited
+			// FirstSpawnWarningSound "Soldier.M_MVM_LaughEvil02"
+			WaitBeforeStarting 14
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name timer
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_5min.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			DoneOutput
+			{
+				Target boss_deploy_relay
+				Action Trigger
+			}
+			Where none
+			TFBot
+			{
+				Name "Game Over"
+				ClassIcon thenuke
+				Class Scout
+				Health 2250
+				Scale 0.01
+				Attributes SuppressFire
+				Attributes IgnoreFlag
+				Attributes IgnoreEnemies
+				Attributes UseBossHealthBar
+				Attributes MiniBoss
+				CharacterAttributes
+				{
+					"health drain" -8
+					"move speed bonus" 0.0001
+					"dmg taken from bullets increased" 0
+					"dmg taken from blast increased" 0
+					"dmg taken from fire increased" 0
+					"cancel falling damage" 1
+				}
+				Tag "popext_extraspawn{where = `spawnbot_timer`, spawn_protection = 0}"
+			}
+		}
+		WaveSpawn
+		{
+			Name timer2
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			WaitBeforeStarting 2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name timer3
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 4
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name timer4
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 6
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 2min
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_2min.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 181
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name timer5
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound mvm/mvm_warning.wav
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 181
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 60sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_60sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 241
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 30sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_30sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 271
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 20sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_20sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 281
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 10sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_10sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 291
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 5sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_5sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 296
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 4sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_4sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 297
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 3sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_3sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 298
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 2sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_2sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 299
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name 1sec
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound vo/announcer_ends_1sec.mp3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 300
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name alarm
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound ambient/alarms/doomsday_lift_alarm.wav
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 291
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name alarm
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound ambient/alarms/doomsday_lift_alarm.wav
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 293
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name alarm
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound ambient/alarms/doomsday_lift_alarm.wav
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 295
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name alarm
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound ambient/alarms/doomsday_lift_alarm.wav
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 297
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name alarm
+			TotalCurrency 0
+			Support limited
+			FirstSpawnWarningSound ambient/alarms/doomsday_lift_alarm.wav
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 299
+			Where none
+			TFBot
+			{
+				Class Scout
+				ClassIcon thenuke
+			}
+		}
+		WaveSpawn
+		{
+			Name	w5
+			Support 1
+			MaxActive 5
+			SpawnCount 5
+			Where	spawnbot_house
+			TFBot
+			{
+				Name "Gunbai Scout"
+				ClassIcon scout_fanowar
+				Class Scout
+				Health 125
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				Item "The Fan O'War"
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w6
+			Support 2019
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 1
+			Where	spawnbot_invasion_house
+			TFBot
+			{
+				Template T_TFBot_Soldier_Fast
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w5
+			Support 10
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 1
+			Where	spawnbot_invasion
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heavyweight_Champ
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w3
+			Support 10
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting 1
+			Where	spawnbot_house
+			TFBot
+			{
+				Template T_TFBot_Demoman_Knight
+				Item "The B.M.O.C."
+			}
+		}
+	}
+	Mission
+	{
+		Objective Engineer
+		Where Behind
+		InitialCooldown 30
+		CooldownTime 20
+		BeginAtWave 6
+		RunForThisManyWaves 1
+		DesiredCount 1
+		TFBot
+		{
+			Template T_TFBot_Engineer_Sentry_Teleporter
+		}
+	}
+}

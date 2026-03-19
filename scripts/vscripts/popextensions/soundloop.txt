@@ -1,0 +1,365 @@
+// ============================================================================
+// SOUNDLOOP - FINAL ROBUST IMPLEMENTATION (NO DRYMIX FORCED)
+// ============================================================================
+
+if (!("SoundLoop" in ROOT)) {
+    ::SoundLoop <- {
+        Token = null,
+        IsActive = false,
+        CurrentSound = null,
+        LastSound = null, // Fixes "Once Only" bug
+        Controller = null,
+        Emitter = null,
+        InitTime = 0.0
+    }
+}
+
+// Ensure properties exist
+if (!("Token" in ::SoundLoop)) ::SoundLoop.Token <- null
+if (!("IsActive" in ::SoundLoop)) ::SoundLoop.IsActive <- false
+if (!("CurrentSound" in ::SoundLoop)) ::SoundLoop.CurrentSound <- null
+if (!("LastSound" in ::SoundLoop)) ::SoundLoop.LastSound <- null
+if (!("Controller" in ::SoundLoop)) ::SoundLoop.Controller <- null
+if (!("Emitter" in ::SoundLoop)) ::SoundLoop.Emitter <- null
+if (!("InitTime" in ::SoundLoop)) ::SoundLoop.InitTime <- 0.0
+
+// Cleanup old
+if ("CurrentSessionID" in ::SoundLoop) delete ::SoundLoop.CurrentSessionID
+if ("Emitters" in ::SoundLoop) delete ::SoundLoop.Emitters
+if ("Emitter" in ::SoundLoop) delete ::SoundLoop.Emitter
+if ("PopfileName" in ::SoundLoop) delete ::SoundLoop.PopfileName
+
+// ----------------------------------------------------------------------------
+// Helper: Stop Sound
+// ----------------------------------------------------------------------------
+function MissionAttributes::SoundLoop_StopSound(sound_name) {
+    if (!sound_name || sound_name == "") return
+    
+    // Safety check
+    if (!("PopExtUtil" in ROOT)) return
+    
+    local clean = sound_name
+    if (clean.len() > 0 && clean[0] == '#') clean = clean.slice(1)
+    local variants = [sound_name, clean, "#" + clean]
+    
+    // 1. Stop on Worldspawn (Primary)
+    local worldspawn = PopExtUtil.Worldspawn
+    if (worldspawn && worldspawn.IsValid()) {
+        foreach (snd in variants) {
+            try { StopSoundOn(snd, worldspawn) } catch(e) {}
+            foreach(chan in [0, 2, 6]) {
+                try { EmitSoundEx({ sound_name = snd, entity = worldspawn, channel = chan, flags = SND_STOP }) } catch(e) {}
+            }
+            try { EmitSoundEx({ sound_name = snd, filter_type = RECIPIENT_FILTER_GLOBAL, flags = SND_STOP }) } catch(e) {}
+        }
+    }
+    
+    // 2. Stop on Clients (Using HumanArray as requested)
+    try {
+        PopExtUtil.ValidatePlayerTables()
+        foreach (player in PopExtUtil.HumanArray) {
+            if (!player || !player.IsValid()) continue
+            
+            foreach (snd in variants) {
+                try { StopSoundOn(snd, player) } catch(e) {}
+                try { EmitSoundEx({ sound_name = snd, entity = player, channel = 6, flags = SND_STOP }) } catch(e) {}
+                try { EmitSoundEx({ sound_name = snd, entity = player, channel = 0, flags = SND_STOP }) } catch(e) {}
+            }
+            
+            // Volume Stomp
+            try {
+                EmitSoundEx({
+                    sound_name = "common/null.wav",
+                    entity = player,
+                    channel = 6,
+                    volume = 0.0,
+                    flags = SND_CHANGE_VOL
+                })
+            } catch(e) {}
+        }
+    } catch(e) {}
+}
+
+// ----------------------------------------------------------------------------
+// Helper: Precache
+// ----------------------------------------------------------------------------
+function MissionAttributes::SoundLoop_Precache(sound_name) {
+    if (!sound_name || sound_name == "") return
+    local clean = sound_name
+    if (clean.len() > 0 && clean[0] == '#') clean = clean.slice(1)
+    try { PrecacheSound(clean) } catch(e) {}
+    try { PrecacheScriptSound(clean) } catch(e) {}
+    if (sound_name != clean) try { PrecacheSound(sound_name) } catch(e) {}
+}
+
+// ----------------------------------------------------------------------------
+// Helper: Play Sound
+// ----------------------------------------------------------------------------
+function MissionAttributes::SoundLoop_PlaySound(sound_name, volume) {
+    if (!sound_name || sound_name == "") return
+    
+    MissionAttributes.SoundLoop_Precache(sound_name)
+    local worldspawn = PopExtUtil.Worldspawn
+    
+    try {
+        EmitSoundEx({
+            sound_name = sound_name,
+            entity = worldspawn,
+            channel = 0, // CHAN_AUTO
+            sound_level = 0,
+            volume = volume,
+            flags = SND_NOFLAGS,
+            filter_type = RECIPIENT_FILTER_GLOBAL
+        })
+        printl("[SoundLoop] Playing: " + sound_name)
+    } catch(e) {
+        printl("[SoundLoop] Play Failed: " + e)
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Halt
+// ----------------------------------------------------------------------------
+function MissionAttributes::SoundLoop_Halt() {
+    printl("[SoundLoop] HALT Executing")
+    
+    ::SoundLoop.Token = null
+    ::SoundLoop.IsActive = false
+    
+    if (::SoundLoop.CurrentSound) {
+        MissionAttributes.SoundLoop_StopSound(::SoundLoop.CurrentSound)
+        ::SoundLoop.CurrentSound = null
+    }
+    
+    // Safety Check on LastSound (Fixes "Once Only" bug)
+    if (::SoundLoop.LastSound) {
+        MissionAttributes.SoundLoop_StopSound(::SoundLoop.LastSound)
+    }
+    
+    // Kill Controller
+    if (::SoundLoop.Controller && ::SoundLoop.Controller.IsValid()) {
+        try { SetPropString(::SoundLoop.Controller, "m_iszScriptThinkFunction", "") } catch(e) {}
+        try { ::SoundLoop.Controller.Kill() } catch(e) {}
+    }
+    ::SoundLoop.Controller = null
+    
+    // Orphans
+    local ent = null
+    while (ent = FindByName(ent, "__popext_soundloop_controller")) {
+        try { SetPropString(ent, "m_iszScriptThinkFunction", "") } catch(e) {}
+        ent.Kill()
+    }
+    
+    // Cleanup hooks - SESSION ONLY (SL_Sess_*)
+    // DO NOT remove Global hooks (SL_Global_*)
+    try { POP_EVENT_HOOK("mvm_begin_wave", "SL_Sess_*", null, EVENT_WRAPPER_MISSIONATTR) } catch(e) {}
+    try { POP_EVENT_HOOK("mvm_wave_complete", "SL_Sess_*", null, EVENT_WRAPPER_MISSIONATTR) } catch(e) {}
+    try { POP_EVENT_HOOK("mvm_wave_failed", "SL_Sess_*", null, EVENT_WRAPPER_MISSIONATTR) } catch(e) {}
+}
+::SoundLoop.Halt <- MissionAttributes.SoundLoop_Halt.bindenv(MissionAttributes)
+
+// ----------------------------------------------------------------------------
+// GLOBAL CLEANUP HOOK
+// ----------------------------------------------------------------------------
+// We removed the "if !Registered" check. This forces the hook to refresh on 
+// every script load, ensuring it survives wave jumps.
+MissionAttributes.SoundLoop_CleanupRegistered <- true
+
+POP_EVENT_HOOK("teamplay_round_start", "SL_Global_Cleanup", function(params) {
+    
+    // 1. Init Check (Preserve if we just initialized)
+    if (::SoundLoop.InitTime > 0.0 && (Time() - ::SoundLoop.InitTime) < 1.0) {
+        printl("[SoundLoop] Just initialized - Skipping cleanup.")
+        return
+    }
+    
+    // 2. Immediate Stop (Fixes Wave Jump Audio Persistence)
+    // Check LastSound to catch cases where CurrentSound was already nulled
+    if (::SoundLoop.CurrentSound) {
+        printl("[SoundLoop] Round Reset - Stopping Current.")
+        MissionAttributes.SoundLoop_StopSound(::SoundLoop.CurrentSound)
+    }
+    if (::SoundLoop.LastSound) {
+        printl("[SoundLoop] Round Reset - Stopping Last.")
+        MissionAttributes.SoundLoop_StopSound(::SoundLoop.LastSound)
+    }
+    
+    // 3. Mark Pending
+    MissionAttributes.SoundLoop_PendingInit <- true
+    ::SoundLoop.IsActive = false
+    
+    // 4. Delayed Halt
+    EntFireByHandle(MissionAttrEntity, "RunScriptCode", @"
+        if (`SoundLoop_PendingInit` in MissionAttributes && MissionAttributes.SoundLoop_PendingInit) {
+            printl(`[SoundLoop] Not active this wave - HALTING`)
+            SoundLoop.Halt()
+            ::SoundLoop.LastSound = null // Clear history only after full halt
+        }
+        MissionAttributes.SoundLoop_PendingInit <- false
+    ", 0.2, null, null)
+}, EVENT_WRAPPER_MISSIONATTR)
+
+// ----------------------------------------------------------------------------
+// ATTRIBUTE IMPLEMENTATION
+// ----------------------------------------------------------------------------
+MissionAttributes.Attrs.SoundLoop <- function(value) {
+    printl("[SoundLoop] Initializing...")
+    MissionAttributes.SoundLoop_PendingInit <- false
+    
+    // Halt old session
+    local old_sound = ::SoundLoop.CurrentSound
+    ::SoundLoop.CurrentSound = null 
+    MissionAttributes.SoundLoop_Halt()
+    
+    if (typeof value != "table") {
+        if (old_sound) MissionAttributes.SoundLoop_StopSound(old_sound)
+        return false
+    }
+    
+    ::SoundLoop.InitTime = Time()
+    ::SoundLoop.Token = Time().tointeger() + "_" + RandomInt(0,9999)
+    ::SoundLoop.IsActive = true
+    printl("[SoundLoop] Token: " + ::SoundLoop.Token)
+    
+    local controller = SpawnEntityFromTable("logic_relay", { targetname = "__popext_soundloop_controller" })
+    SetPropBool(controller, STRING_NETPROP_PURGESTRINGS, true)
+    ::SoundLoop.Controller = controller
+    
+    controller.ValidateScriptScope()
+    local scope = controller.GetScriptScope()
+    
+    // STORE CREATION WAVE
+    scope.created_wave_idx <- GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+    
+    // Parse
+    local ParseConfig = function(cfg) {
+        local list = [], order = "list"
+        if ("Order" in cfg) order = cfg.Order.tolower()
+        foreach(k,v in cfg) {
+            if (k=="Order" || typeof v != "table") continue
+            try {
+                local raw = ("Sound" in v) ? v.Sound.tostring() : ""
+                if (raw=="") continue
+                // REMOVED: Forced '#' prefix
+                // if (raw.len()>0 && raw[0]!='#') raw = "#"+raw 
+                MissionAttributes.SoundLoop_Precache(raw)
+                list.append({
+                    sound = raw,
+                    duration = ("Duration" in v) ? v.Duration.tofloat() : 60.0,
+                    volume = ("Volume" in v) ? v.Volume.tofloat() : 1.0,
+                    idx = k.tointeger()
+                })
+            } catch(e){}
+        }
+        list.sort(@(a,b) a.idx <=> b.idx)
+        return { tracks=list, order=order }
+    }
+    
+    scope.Playlists <- { 
+        intermission = ("Intermission" in value) ? ParseConfig(value.Intermission) : { tracks=[], order="list" },
+        wave = ("Wave" in value) ? ParseConfig(value.Wave) : { tracks=[], order="list" }
+    }
+    
+    local is_wave = PopExtUtil.IsWaveStarted
+    scope.State <- {
+        mode = is_wave ? "wave" : "intermission",
+        index = 0, bag = [],
+        next_time = Time() + (is_wave ? 0.5 : 1.5),
+        token = ::SoundLoop.Token
+    }
+    
+    if (old_sound) MissionAttributes.SoundLoop_StopSound(old_sound)
+    
+    // PlayNext
+    scope.PlayNext <- function() {
+        if (::SoundLoop.Token != State.token || !::SoundLoop.IsActive) return
+        
+        local pl = Playlists[State.mode]
+        if (pl.tracks.len() == 0) return
+        
+        local idx = 0, count = pl.tracks.len()
+        if (pl.order=="random") idx=RandomInt(0,count-1)
+        else if (pl.order=="shuffle") {
+            if (State.bag.len()==0) for(local i=0;i<count;i++) State.bag.append(i)
+            local r=RandomInt(0,State.bag.len()-1); idx=State.bag[r]; State.bag.remove(r)
+        } else { idx=State.index; State.index=(State.index+1)%count }
+        
+        local track = pl.tracks[idx]
+        
+        if (::SoundLoop.CurrentSound) MissionAttributes.SoundLoop_StopSound(::SoundLoop.CurrentSound)
+        ::SoundLoop.CurrentSound = track.sound
+        ::SoundLoop.LastSound = track.sound // Persistence Fix
+        
+        local vol = (track.volume > 1.0) ? 1.0 : track.volume
+        local snd = track.sound
+        
+        EntFireByHandle(MissionAttrEntity, "RunScriptCode", format(@"
+            if (::SoundLoop.Token == `%s` && ::SoundLoop.IsActive) {
+                MissionAttributes.SoundLoop_PlaySound(`%s`, %f)
+            }
+        ", State.token, snd, vol), 0.1, null, null)
+        
+        State.next_time = Time() + (track.duration > 0 ? track.duration : 60.0)
+    }
+    
+    scope.Think <- function() {
+        if (::SoundLoop.Token != State.token || !::SoundLoop.IsActive) {
+            SetPropString(self, "m_iszScriptThinkFunction", "")
+            return
+        }
+        
+        // NATURAL PROGRESSION CHECK (INSIDE THINK)
+        local current_wave = GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+        if ("created_wave_idx" in this && created_wave_idx != current_wave) {
+            printl("[SoundLoop] Natural Progression (Think): Wave Changed. Halting.")
+            MissionAttributes.SoundLoop_Halt()
+            return
+        }
+        
+        if (Time() >= State.next_time) PlayNext()
+        return 0.1
+    }
+    
+    scope.ChangeMode <- function(m) {
+        if (::SoundLoop.Token != State.token) return
+        printl("[SoundLoop] Mode: " + m)
+        if (::SoundLoop.CurrentSound) MissionAttributes.SoundLoop_StopSound(::SoundLoop.CurrentSound)
+        ::SoundLoop.CurrentSound = null
+        State.mode = m; State.index = 0; State.bag = []; State.next_time = Time() + 0.1
+    }
+    
+    local token = ::SoundLoop.Token
+    POP_EVENT_HOOK("mvm_begin_wave", "SL_Sess_Start_"+token, function(p) {
+        if (::SoundLoop.Token != token || !controller || !controller.IsValid()) return
+        
+        // NATURAL PROGRESSION CHECK (AT WAVE START)
+        // We use PopExtUtil.RunWithDelay to properly scope the check 0.2s after wave start
+        PopExtUtil.RunWithDelay(0.2, function() {
+            if (!self.IsValid()) return
+            local current_wave = GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+            
+            // If the wave number has changed, and we are still the active controller, 
+            // it means we are old logic persisting into a new wave.
+            if ("created_wave_idx" in this && created_wave_idx != current_wave) {
+                printl("[SoundLoop] Natural Progression (Hook): Wave Changed. Halting.")
+                MissionAttributes.SoundLoop_Halt()
+                return
+            }
+            ChangeMode("wave")
+        }, scope)
+        
+    }, EVENT_WRAPPER_MISSIONATTR)
+    
+    POP_EVENT_HOOK("mvm_wave_complete", "SL_Sess_End_"+token, function(p) {
+        if (::SoundLoop.Token != token || !controller || !controller.IsValid()) return
+        controller.GetScriptScope().ChangeMode("intermission")
+    }, EVENT_WRAPPER_MISSIONATTR)
+    
+    POP_EVENT_HOOK("mvm_wave_failed", "SL_Sess_Fail_"+token, function(p) {
+        if (::SoundLoop.Token != token || !controller || !controller.IsValid()) return
+        controller.GetScriptScope().ChangeMode("intermission")
+    }, EVENT_WRAPPER_MISSIONATTR)
+    
+    AddThinkToEnt(controller, "Think")
+    return true
+}
