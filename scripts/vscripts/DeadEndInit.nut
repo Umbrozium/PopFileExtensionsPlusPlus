@@ -88,9 +88,7 @@
 							}
 						}
 					}
-					NoInstaBuild = 1
-					NoInfiniteMetal = 1
-					MissionName = "Dead End (Expert)"
+					MissionName = "Dead End (Expert)             "
 					MapDarkness = 2
 					WaveStartCountdown = 7
 					TeamWipeWaveLoss = 1
