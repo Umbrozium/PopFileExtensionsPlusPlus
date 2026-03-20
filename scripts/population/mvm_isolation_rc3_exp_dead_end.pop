@@ -332,10 +332,6 @@ Coldfront_Calamity // Made by 7tury frfr mane
 				
 				PopExt.CustomTank(`abc*`, {
 
-                    Scale = `0.5`
-                    DisableSmoke = true
-					NoDeathFX = 2
-
                     function OnSpawn(tank, name) {
 
                         local prop = SpawnEntityFromTable(`prop_dynamic`, {model = `models/props_badlands/barrel01.mdl`, origin = `0 0 79`})
@@ -377,6 +373,13 @@ Coldfront_Calamity // Made by 7tury frfr mane
         			Param "
 							SoundLoop.Halt()
 							EntFire(`doorbutton_hit`, `enablecollision`)
+							PopExtUtil.ShowAnnotation( {
+								text = `Get the button behind you and move out.`
+								pos = Vector( -2557, 1657, 56 )
+								lifetime = 5.0
+								sound = `ui/hint.wav`
+								players = [GetListenServerHost()]
+							} )
 					"
     			}
 			TFBot

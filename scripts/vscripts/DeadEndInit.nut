@@ -1,6 +1,6 @@
 				IncludeScript("mytemplates.nut", getroottable())
-				// EntFire("door1_trigger", "Disable")
-				// EntFire("door2_trigger", "Disable")
+				EntFire("door1_trigger", "Disable")
+				EntFire("door2_trigger", "Disable")
 				Info(@"We were abandoned.
 				|PAUSE 3
 				|We've been struggling against the machines for days on end.
@@ -94,7 +94,7 @@
 					MapDarkness = 2
 					WaveStartCountdown = 7
 					TeamWipeWaveLoss = 1
-					NoUpgrades = "The rubble is in the way. Besides, you don't have any money."
+					NoUpgrades = "Broken."
 					ClassRequirements = {
 						Engineer = 1
 					}
