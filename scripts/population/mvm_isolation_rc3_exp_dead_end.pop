@@ -332,6 +332,10 @@ Coldfront_Calamity // Made by 7tury frfr mane
 				
 				PopExt.CustomTank(`abc*`, {
 
+                    Scale = `0.5`
+                    DisableSmoke = true
+					NoDeathFX = 2
+
                     function OnSpawn(tank, name) {
 
                         local prop = SpawnEntityFromTable(`prop_dynamic`, {model = `models/props_badlands/barrel01.mdl`, origin = `0 0 79`})
@@ -347,8 +351,15 @@ Coldfront_Calamity // Made by 7tury frfr mane
 		}
 		StartWaveOutput
 		{
-			Target	wave_start_relay
-			Action	Trigger
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_start_relay`, `Trigger`)
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				MissionAttrs({
+					MissionName = `ACT I: ORDINANCE              `
+				})
+			"
 		}
 		DoneOutput
 		{

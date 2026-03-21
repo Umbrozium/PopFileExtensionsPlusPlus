@@ -1,3 +1,4 @@
+				EntFire("wave_init_relay", "Trigger")
 				IncludeScript("mytemplates.nut", getroottable())
 				EntFire("door1_trigger", "Disable")
 				EntFire("door2_trigger", "Disable")
@@ -18,7 +19,6 @@
 				|Since my metal reserves are just as limited, I'm left with a choice.
 				|Dispenser, Sentry, or the Teleporters...", 
 				"CD2F2F", "Engineer:", false, -1, 0.02, 0, 2, 3)
-				EntFire("wave_init_relay", "Trigger")
 				PopExtUtil.SetConvar( "sv_skyname", "sky_nightfall_01" )
 				MissionAttrs({
 					HoldFireUntilFullReloadFix = 1
