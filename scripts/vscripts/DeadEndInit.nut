@@ -40,7 +40,8 @@
 								["sentry", 2]
 							],
 							"custom building health" : [
-								["sentry", 0.33]
+								["sentry", 0.33],
+								["dispenser", 0.66]
 							]
 						}
 					}

@@ -358,6 +358,20 @@ Coldfront_Calamity // Made by 7tury frfr mane
 				IncludeScript(`popextensions_main.nut`, getroottable())
 				MissionAttrs({
 					MissionName = `ACT I: ORDINANCE              `
+					ItemAttributes = {
+						`The Wrap Assassin` : {
+							`alt-fire cond on hit` : [71, 10],
+							`damage penalty` : 0.01,
+						}
+						`The Gunslinger` : {
+							`extra buildings` : [
+								[`sentry`, 2]
+							],
+							`custom building health` : [
+								[`sentry`, 0.33]
+							]
+						}
+					}
 				})
 			"
 		}
@@ -590,23 +604,6 @@ Coldfront_Calamity // Made by 7tury frfr mane
 				IncludeScript(`popextensions_main.nut`, getroottable())
 				
 				EntFire(`wave_init_relay`, `Trigger`)
-				
-				MissionAttrs({
-					ExtraUpgrades = {
-						ItemUpgrades = {
-							`The Gunslinger` : [
-								{
-									attr = `extra buildings`
-									value = [[`sentry`, `v`]]
-									name = `Build +1 additional sentry`
-									increment = [`v`, 1]
-									cap = 4
-									cost = 500
-								}
-							]
-						}
-					}
-				})
 			"
 		}
 		StartWaveOutput

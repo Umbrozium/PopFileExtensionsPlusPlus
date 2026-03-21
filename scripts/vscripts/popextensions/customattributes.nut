@@ -580,7 +580,7 @@ PopExtAttributes.Attrs <- {
 					final_desc += "\n"
 				}
 			}
-			scope.attribinfo["custom building health"] <- "\n" + final_desc
+			scope.attribinfo["custom building health"] <- final_desc
 		}
 		PopExtAttributes.RefreshDescs(player)
 
