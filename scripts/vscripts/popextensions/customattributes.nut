@@ -550,7 +550,7 @@ PopExtAttributes.Attrs <- {
 				foreach(part in building_name_parts) {
 					building_name_formatted.append(part.slice(0,1).toupper() + part.slice(1))
 				}
-				local building_name = " ".join(building_name_formatted)
+				local building_name = building_name_formatted.join(" ")
 
 				local desc = ""
 				if ( percent >= 0 ) {
@@ -565,7 +565,7 @@ PopExtAttributes.Attrs <- {
 		// Set Description
 		if ( !("attribinfo" in scope) ) scope.attribinfo <- {}
 		if (desc_parts.len() > 0)
-			scope.attribinfo["custom building health"] <- "\n" + "\n".join(desc_parts)
+			scope.attribinfo["custom building health"] <- "\n" + desc_parts.join("\n")
 		PopExtAttributes.RefreshDescs(player)
 
 		// 2. INITIALIZE LOGIC ONCE
