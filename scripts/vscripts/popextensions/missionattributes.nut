@@ -39,7 +39,150 @@ MissionAttributes.OptimizedTracks <- {}
 MissionAttributes.PathNum 		  <- 0
 MissionAttributes.RedMoneyValue   <- 0
 
+// ============================================================================
+// GLOBAL WAVE TRACKING SYSTEM
+// ============================================================================
+if (!("TrueWave" in ROOT)) ::TrueWave <- null
 
+// Helper: Get True Wave
+function MissionAttributes::GetTrueWave() {
+    // If TrueWave is cached (during a spoofed wave), use it.
+    // If null (Intermission/Setup), read the live NetProp.
+    if (::TrueWave != null) return ::TrueWave
+    return GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+}
+
+// 1. Reset on Round Start (Fixes Wave Jump)
+POP_EVENT_HOOK("teamplay_round_start", "Global_WaveReset", function(params) {
+    ::TrueWave = null
+}, 0)
+
+// 2. Reset on Wave Complete (FIXES NATURAL PROGRESSION PERSISTENCE)
+// This ensures that during the Setup of the NEXT wave, we read the real NetProp
+// instead of the stale TrueWave from the previous wave.
+POP_EVENT_HOOK("mvm_wave_complete", "Global_WaveEnd", function(params) {
+    ::TrueWave = null
+}, 0)
+
+// 3. Capture True Wave on Wave Start (Before WaveNum runs)
+POP_EVENT_HOOK("mvm_begin_wave", "Global_WaveTracker", function(params) {
+    ::TrueWave <- GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+}, 0)
+
+// Cleanup hook - runs on EVERY round start FIRST
+POP_EVENT_HOOK("teamplay_round_start", "ClassReq_Cleanup", function(params) {
+    printl("[ClassRequirements] Cleanup hook running")
+    
+    // Set stop flag on all players and directly remove from PlayerThinkTable
+    PopExtUtil.ValidatePlayerTables()
+    foreach(player in PopExtUtil.HumanArray) {
+        if (!player || !player.IsValid()) continue
+        local scope = player.GetScriptScope()
+        if (!scope) continue
+        
+        // Set stop flag
+        scope.classreq_stop <- true
+        
+        // Directly remove from PlayerThinkTable
+        if ("PlayerThinkTable" in scope && "ClassReq_Think" in scope.PlayerThinkTable) {
+            delete scope.PlayerThinkTable["ClassReq_Think"]
+            printl("[ClassRequirements] Removed think from player " + player.entindex())
+        }
+    }
+    
+    // Clear Requirements
+    if ("Requirements" in MissionAttributes) {
+        MissionAttributes.Requirements <- null
+    }
+    
+    // Clear session-specific hooks
+    POP_EVENT_HOOK("post_inventory_application", "ClassReq_Spawn*", null, EVENT_WRAPPER_MISSIONATTR)
+    POP_EVENT_HOOK("player_team", "ClassReq_Team*", null, EVENT_WRAPPER_MISSIONATTR)
+    
+}, 0) // Priority 0 = runs FIRST
+
+// =========================================================
+// SAFETY RESET: Nuclear Option
+// =========================================================
+function MissionAttributes::ResetPlayerVision() {
+	
+	local DoReset = function( player ) {
+		
+		// Trick: Flash Black (Alpha 1) for 0 seconds, then hold for 0.
+		// This forces the engine to process a "Fade Out" event, clearing the stack.
+		// Flags: 1 (IN) + 16 (PURGE)
+		ScreenFade( player, 0, 0, 0, 1, 0.0, 0.0, 17 )
+		
+		// Immediate followup: Clear completely
+		ScreenFade( player, 0, 0, 0, 0, 0.0, 0.0, 17 )
+	}
+
+	for ( local i = 1; i <= MAX_CLIENTS; i++ ) {
+		local player = PlayerInstanceFromIndex( i )
+		if ( !player ) continue
+		
+		DoReset( player )
+		
+		// Hammer it every 0.1s for half a second to beat the race condition
+		PopExtUtil.RunWithDelay( 0.1, function() { if(self.IsValid()) DoReset(self) }, player.GetScriptScope() )
+		PopExtUtil.RunWithDelay( 0.3, function() { if(self.IsValid()) DoReset(self) }, player.GetScriptScope() )
+	}
+
+	// Reset Bloom
+	local tonemap = FindByName( null, "__popext_tonemap_global" )
+	if ( tonemap ) {
+		AddThinkToEnt( tonemap, null )
+		EntFireByHandle( tonemap, "SetBloomScale", "1.0", 0.0, null, null )
+	}
+}
+
+ // legacy compatibility, use PopExtUtil versions instead
+MissionAttributes.SetConvar    <- PopExtUtil
+MissionAttributes.ResetConvars <- PopExtUtil
+
+MissionAttributes.Attrs <- {
+
+	// =========================================
+		// Replicates sigsegv-mvm: ForceHoliday.
+		// Forces a tf_holiday for the mission.
+		// Supported Holidays are:
+		//	0 - None
+		//	1 - Birthday
+		//	2 - Halloween
+		//	3 - Christmas
+	// =========================================
+	function ForceHoliday( value ) {
+
+		// @param Holiday		Holiday number to force.
+		// @error TypeError		If type is not an integer.
+		// @error IndexError	If invalid holiday number is passed.
+			// Error Handling
+
+		value = PopExtUtil.ToStrictNum( value )
+
+		if ( value == null ) {
+			PopExtMain.Error.RaiseTypeError( "ForceHoliday", "int" )
+			return false
+		}
+		else if ( value < kHoliday_None || value >= kHolidayCount ) {
+			PopExtMain.Error.RaiseIndexError( "ForceHoliday", [kHoliday_None, kHolidayCount - 1] )
+			return false
+		}
+
+		// Set Holiday logic
+		PopExtUtil.SetConvar( "tf_forced_holiday", value )
+
+		if ( value == kHoliday_None ) return
+
+		local ent = FindByName( null, "__popext_missionattr_holiday" )
+		if ( ent != null ) ent.Kill()
+
+		SpawnEntityFromTable( "tf_logic_holiday", {
+			targetname   = "__popext_missionattr_holiday",
+			holiday_type = value
+		})
+
+	}
 
 	function ExtraSpawnPoints( value ) {
 
