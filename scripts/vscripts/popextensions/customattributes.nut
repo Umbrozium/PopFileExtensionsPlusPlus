@@ -74,7 +74,7 @@ PopExtAttributes.Descs <- {
 	"dmg bonus while half dead" 	: "%d⁒ damage bonus while half dead",
 	"dmg penalty while half alive"  : "%d⁒ damage penalty while half alive",
 	"extra buildings"				: "The logic of this attribute is a bit too big for a single value of %d.",
-	"custom building health"		: "Modifies building health by a multiplier. E.g. [ [\"sentry\", 0.5], [\"dispenser\", 1.2] ]",
+	"custom building health"		: "The logic of this attribute is a bit too big for a single value of %d.",
 }
 
 PopExtAttributes.Attrs <- {
@@ -531,7 +531,8 @@ PopExtAttributes.Attrs <- {
 			}
 		}
 
-		// 1. PARSE CONFIG
+		// 1. PARSE CONFIG & DESCRIPTION
+		local desc_parts = []
 		if ( typeof value == "array" ) {
 			foreach ( entry in value ) {
 				if ( typeof entry != "array" || entry.len() < 2 ) continue
@@ -540,8 +541,32 @@ PopExtAttributes.Attrs <- {
 				local mult = entry[1].tofloat()
 				
 				scope.CustomBuildingHealth.Config[type_str] <- mult
+
+				local percent = ( mult - 1.0 ) * 100.0
+				
+				// Capitalize first letter, replace underscores
+				local building_name_parts = split(type_str, "_")
+				local building_name_formatted = []
+				foreach(part in building_name_parts) {
+					building_name_formatted.append(part.slice(0,1).toupper() + part.slice(1))
+				}
+				local building_name = " ".join(building_name_formatted)
+
+				local desc = ""
+				if ( percent >= 0 ) {
+					desc = format( "%s has %.0f%% health bonus", building_name, percent )
+				} else {
+					desc = format( "%s has %.0f%% health penalty", building_name, percent )
+				}
+				desc_parts.append(desc)
 			}
 		}
+
+		// Set Description
+		if ( !("attribinfo" in scope) ) scope.attribinfo <- {}
+		if (desc_parts.len() > 0)
+			scope.attribinfo["custom building health"] <- "\n" + "\n".join(desc_parts)
+		PopExtAttributes.RefreshDescs(player)
 
 		// 2. INITIALIZE LOGIC ONCE
 		if ( scope.CustomBuildingHealth.Initialized ) return
