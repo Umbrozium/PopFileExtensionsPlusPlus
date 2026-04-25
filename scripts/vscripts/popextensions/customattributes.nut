@@ -75,6 +75,7 @@ PopExtAttributes.Descs <- {
 	"dmg penalty while half alive"  : "%d⁒ damage penalty while half alive",
 	"extra buildings"				: "The logic of this attribute is a bit too big for a single value of %d.",
 	"custom building health"		: "The logic of this attribute is a bit too big for a single value of %d.",
+	"dispenser properties"			: "The logic of this attribute is a bit too big for a single value of %d.",
 }
 
 PopExtAttributes.Attrs <- {
@@ -678,6 +679,226 @@ PopExtAttributes.Attrs <- {
 				}
 			}
 		}, EVENT_WRAPPER_CUSTOMATTR )
+	}
+
+	function DispenserProperties( player, item, value ) {
+
+		if ( !player || !player.IsValid() ) return
+
+		local scope = player.GetScriptScope()
+		if ( !("DispenserProperties" in scope) ) {
+			scope.DispenserProperties <- {
+				Config = { metal = 1.0, metal_rate = 1.0, ammo = 1.0, ammo_rate = 1.0 },
+				Initialized = false
+			}
+		}
+
+		// 1. PARSE CONFIG & DESCRIPTION
+		if ( typeof value == "array" ) {
+			foreach ( entry in value ) {
+				if ( typeof entry != "array" || entry.len() < 2 ) continue
+				
+				local k = entry[0].tolower()
+				local v = entry[1].tofloat()
+				
+				if ( k == "metal" ) scope.DispenserProperties.Config.metal = v
+				else if ( k == "metal rate" ) scope.DispenserProperties.Config.metal_rate = v
+				else if ( k == "ammo" ) scope.DispenserProperties.Config.ammo = v
+				else if ( k == "ammo rate" ) scope.DispenserProperties.Config.ammo_rate = v
+			}
+		}
+
+		local config = scope.DispenserProperties.Config
+		
+		local m_word = config.metal >= 1.0 ? "more" : "less"
+		local m_val = config.metal >= 1.0 ? (config.metal - 1.0)*100 : (1.0 - config.metal)*100
+		
+		local a_word = config.ammo >= 1.0 ? "more" : "less"
+		local a_val = config.ammo >= 1.0 ? (config.ammo - 1.0)*100 : (1.0 - config.ammo)*100
+		
+		local mr_word = config.metal_rate >= 1.0 ? "increased" : "decreased"
+		local mr_val = config.metal_rate >= 1.0 ? (config.metal_rate - 1.0)*100 : (1.0 - config.metal_rate)*100
+		
+		local ar_word = config.ammo_rate >= 1.0 ? "increased" : "decreased"
+		local ar_val = config.ammo_rate >= 1.0 ? (config.ammo_rate - 1.0)*100 : (1.0 - config.ammo_rate)*100
+
+		local desc_part1 = format( "Dispenser gives %.0f⁒ %s metal and %.0f⁒ %s ammo.", m_val, m_word, a_val, a_word )
+		local desc_part2 = format( "Metal rate %s by %.0f⁒, ammo rate %s by %.0f⁒.", mr_word, mr_val, ar_word, ar_val )
+
+		if ( !("attribinfo" in scope) ) scope.attribinfo <- {}
+		scope.attribinfo["dispenser properties"] <- desc_part1 + "\n" + desc_part2
+		PopExtAttributes.RefreshDescs(player)
+
+		// 2. INITIALIZE LOGIC ONCE
+		if ( scope.DispenserProperties.Initialized ) return
+		scope.DispenserProperties.Initialized = true
+
+		local player_id = PopExtUtil.PlayerTable[player]
+
+		// Global item pickup hooks to safely ignore ammopack/locker gains
+		if (!("dp_pickup_hook_registered" in PopExtAttributes)) {
+			PopExtAttributes.dp_pickup_hook_registered <- true
+			POP_EVENT_HOOK("item_pickup", "DP_ItemPickup", function(params) {
+				local p = GetPlayerFromUserID(params.userid)
+				if (p && p.IsValid()) p.GetScriptScope().dp_last_ammo_pickup <- Time()
+			}, EVENT_WRAPPER_CUSTOMATTR)
+			
+			POP_EVENT_HOOK("post_inventory_application", "DP_Locker", function(params) {
+				local p = GetPlayerFromUserID(params.userid)
+				if (p && p.IsValid()) p.GetScriptScope().dp_last_ammo_pickup <- Time()
+			}, EVENT_WRAPPER_CUSTOMATTR)
+		}
+
+		local built_hook_name = format("DispenserProperties_%d_built", player_id)
+
+		POP_EVENT_HOOK("player_builtobject", built_hook_name, function(params) {
+			if ( !player || !player.IsValid() || !("DispenserProperties" in player.GetScriptScope()) )
+			{
+				POP_EVENT_HOOK("player_builtobject", built_hook_name, null, EVENT_WRAPPER_CUSTOMATTR);
+				return;
+			}
+			
+			local builder = GetPlayerFromUserID(params.userid)
+			if (builder != player || params.object != 0) return // 0 = OBJ_DISPENSER
+			
+			local dispenser = EntIndexToHScript(params.index)
+			if (!dispenser || !dispenser.IsValid()) return
+
+			local d_scope = dispenser.GetScriptScope()
+			d_scope.dp_last_metal <- GetPropInt(dispenser, "m_iAmmoMetal")
+			d_scope.dp_metal_fraction <- 0.0
+			d_scope.dp_tracked_players <- {}
+
+			local dp_think = function() {
+				if (!dispenser || !dispenser.IsValid()) return -1
+
+				if (GetPropBool(dispenser, "m_bPlacing") || GetPropBool(dispenser, "m_bHasSapper") || dispenser.GetHealth() <= 0) {
+					return 0.05
+				}
+
+				local cfg = builder.GetScriptScope().DispenserProperties.Config
+
+				// 1. METAL GENERATION RATE (Inside Dispenser Storage)
+				local current_metal = GetPropInt(dispenser, "m_iAmmoMetal")
+				if (current_metal > dp_last_metal) {
+					local generated = current_metal - dp_last_metal
+					local actual_gen = generated * cfg.metal_rate
+					local int_gen = actual_gen.tointeger()
+					
+					dp_metal_fraction += (actual_gen - int_gen)
+					if (dp_metal_fraction >= 1.0) {
+						int_gen += 1
+						dp_metal_fraction -= 1.0
+					} else if (dp_metal_fraction <= -1.0) {
+						int_gen -= 1
+						dp_metal_fraction += 1.0
+					}
+
+					local new_metal = dp_last_metal + int_gen
+					local max_metal = 400 // Safe standard cap
+					if (new_metal > max_metal) new_metal = max_metal
+					if (new_metal < 0) new_metal = 0
+
+					SetPropInt(dispenser, "m_iAmmoMetal", new_metal)
+					dp_last_metal = new_metal
+				} else {
+					dp_last_metal = current_metal
+				}
+				
+				// 2. DISPENSE YIELD TRACKING (To Players)
+				local origin = dispenser.GetOrigin()
+				for (local i = 1; i <= MaxClients().tointeger(); i++) {
+					local p = PlayerInstanceFromIndex(i)
+					if (!p || !p.IsValid() || !p.IsAlive()) continue
+					if (p.GetTeam() != dispenser.GetTeam()) continue
+					
+					local dist = (p.GetOrigin() - origin).Length()
+					if (dist > 160.0) {
+						if (p in dp_tracked_players) delete dp_tracked_players[p]
+						continue
+					}
+
+					if (!(p in dp_tracked_players)) {
+						dp_tracked_players[p] <- {
+							a1 = GetPropIntArray(p, "m_iAmmo", 1),
+							a2 = GetPropIntArray(p, "m_iAmmo", 2),
+							m = GetPropIntArray(p, "m_iAmmo", 3),
+							rate_frac = cfg.ammo_rate < 1.0 ? (1.0 - cfg.ammo_rate) : 0.0
+						}
+					}
+
+					local tr = dp_tracked_players[p]
+					local p_scope = p.GetScriptScope()
+					
+					// Protect against overriding Ammo Pack or Locker pickups
+					local just_picked_up = ("dp_last_ammo_pickup" in p_scope && (Time() - p_scope.dp_last_ammo_pickup) < 0.2)
+
+					local cur_a1 = GetPropIntArray(p, "m_iAmmo", 1)
+					local cur_a2 = GetPropIntArray(p, "m_iAmmo", 2)
+					local cur_m = GetPropIntArray(p, "m_iAmmo", 3)
+
+					if (!just_picked_up) {
+						local diff_a1 = cur_a1 - tr.a1
+						local diff_a2 = cur_a2 - tr.a2
+						local diff_m = cur_m - tr.m
+
+						if (diff_a1 > 0 || diff_a2 > 0 || diff_m > 0) {
+							
+							// A. AMMO YIELD & RATE
+							if (diff_a1 > 0 || diff_a2 > 0) {
+								tr.rate_frac += cfg.ammo_rate
+								local sim_ticks = 0
+								while (tr.rate_frac >= 1.0) {
+									sim_ticks++
+									tr.rate_frac -= 1.0
+								}
+								
+								if (sim_ticks > 0) {
+									if (diff_a1 > 0) {
+										local new_diff = (diff_a1 * cfg.ammo * sim_ticks).tointeger()
+										cur_a1 = tr.a1 + new_diff
+										SetPropIntArray(p, "m_iAmmo", cur_a1, 1)
+									}
+									if (diff_a2 > 0) {
+										local new_diff = (diff_a2 * cfg.ammo * sim_ticks).tointeger()
+										cur_a2 = tr.a2 + new_diff
+										SetPropIntArray(p, "m_iAmmo", cur_a2, 2)
+									}
+								} else {
+									// Skip tick entirely to simulate reduced rate
+									if (diff_a1 > 0) { cur_a1 = tr.a1; SetPropIntArray(p, "m_iAmmo", cur_a1, 1); }
+									if (diff_a2 > 0) { cur_a2 = tr.a2; SetPropIntArray(p, "m_iAmmo", cur_a2, 2); }
+								}
+							}
+
+							// B. METAL YIELD
+							if (diff_m > 0 && cfg.metal != 1.0) {
+								local allowed_m = (diff_m * cfg.metal).tointeger()
+								cur_m = tr.m + allowed_m
+								SetPropIntArray(p, "m_iAmmo", cur_m, 3)
+								
+								// Refund unspent metal (or deduct over-spent metal) from the dispenser
+								local refund = diff_m - allowed_m
+								if (refund != 0) {
+									local cur_storage = GetPropInt(dispenser, "m_iAmmoMetal")
+									if (cur_storage + refund <= 400 && cur_storage + refund >= 0) {
+										SetPropInt(dispenser, "m_iAmmoMetal", cur_storage + refund)
+										dp_last_metal = cur_storage + refund
+									}
+								}
+							}
+						}
+					}
+
+					tr.a1 = cur_a1
+					tr.a2 = cur_a2
+					tr.m = cur_m
+				}
+				return 0.05
+			}
+			PopExtUtil.AddThink(dispenser, dp_think)
+
+		}, EVENT_WRAPPER_CUSTOMATTR)
 	}
 	
 	function SelfAddCondOnHit( player, item, value ) {

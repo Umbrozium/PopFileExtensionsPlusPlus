@@ -2225,4 +2225,223 @@ Coldfront_Calamity // Made by 7tury frfr mane
 			Template T_TFBot_Engineer_Sentry_Teleporter
 		}
 	}
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// Load popextensions script
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				IncludeScript(`ERROR.nut`, getroottable())
+				function AnimateWaveCounter()
+				{
+					local objResource = PopExtUtil.ObjectiveResource;
+					try
+					{
+						SetPropInt(objResource, `m_nMannVsMachineMaxWaveCount`, 0);
+					}
+					catch (e)
+					{
+						printl(`[WaveAnimator] Warning: Could not set max wave count. ` + e);
+					}
+					local oldController = null;
+					while (oldController = FindByName(oldController, `__wave_animator_controller`))
+					{
+						SetPropString(oldController, `m_iszScriptThinkFunction`, ``);
+						oldController.Kill();
+					}
+					local controller = SpawnEntityFromTable(`logic_relay`, { targetname = `__wave_animator_controller` });
+					if (!controller || !controller.IsValid())
+					{
+						printl(`[WaveAnimator] ERROR: Failed to create controller entity.`);
+						return;
+					}
+					controller.ValidateScriptScope();
+					local scope = controller.GetScriptScope();
+					scope.Think <- function()
+					{
+						if (PopExtUtil.ObjectiveResource == null || !PopExtUtil.ObjectiveResource.IsValid())
+						{
+							printl(`[WaveAnimator] Objective resource invalid. Halting animation.`);
+							self.Kill();
+							return;
+						}
+						local randomWaveNumber = RandomInt(0, 512);
+						try
+						{
+							SetPropInt(PopExtUtil.ObjectiveResource, `m_nMannVsMachineWaveCount`, randomWaveNumber);
+						}
+						catch (e) { /* Fail silently to avoid spam */ }
+						return 0.01;
+					}
+					AddThinkToEnt(controller, `Think`);
+					printl(`[WaveAnimator] Wave counter animation started.`);
+				}
+				AnimateWaveCounter();
+			"
+		}
+		StartWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_start_relay`, `Trigger`)
+				IncludeScript(`popextensions_main.nut`, getroottable())
+				MissionAttrs({
+					MissionName = `OH GOD WHAT HAVE YOU DONE`
+					ItemAttributes = {
+						`The Wrap Assassin` : {
+							`alt-fire cond on hit` : [71, 10],
+							`damage penalty` : 0.01,
+						}
+						`The Gunslinger` : {
+							`extra buildings` : [
+								[`sentry`, 2]
+							],
+							`custom building health` : [
+								[`sentry`, 0.33],
+								[`dispenser`, 0.66]
+							]
+							`dispenser properties` : [
+								[`metal`, 0.25],
+								[`metal rate`, 0.5],
+								[`ammo`, 0.5],
+								[`ammo rate`, 0.5],
+							]
+						}
+					}
+					MaxWaveNum = 0
+				})
+			"
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	w16verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting 4
+			Where	none
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			FirstSpawnOutput
+    			{
+        			Target BigNet
+        			Action RunScriptCode
+        			Param "
+							// SoundLoop.Halt()
+							EntFire(`doorbutton_hit`, `enablecollision`)
+							PopExtUtil.ShowAnnotation( {
+								text = `ERR_UNCAUGHT_EXCEPTION`
+								pos = Vector( -2557, 1657, 56 )
+								lifetime = 5.0
+								sound = `ui/hint.wav`
+								players = [GetListenServerHost()]
+							} )
+					"
+    			}
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w13verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting 6
+			Where	none
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w14verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting 8
+			Where	none
+			Support limited
+			FirstSpawnWarningSound items/cart_warning_single.wav
+			TFBot
+			{
+				Name "Pyro"
+				Class Pyro
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+			}
+		}
+		WaveSpawn
+		{
+			Name	w15verycool
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			TFBot
+			{
+				Name "Heavy"
+				Class Heavyweapons
+				Health 175
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes IgnoreFlag
+				Item "The B.M.O.C."
+				Tag "popext_extraspawn{where = `spawnbot_ambush`}"
+			}
+		}
+		WaveSpawn
+        {
+            Name w3030dicelynone
+            TotalCount 1
+            TotalCurrency 0
+			WaitBeforeStarting 4
+            Tank
+            {
+                Health 100
+                Speed 75
+                Name "abcd"
+                StartingPathTrackNode "mytankpath1_1"
+
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+        }
+	}
 }

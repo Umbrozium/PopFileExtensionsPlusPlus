@@ -1998,6 +1998,31 @@ function PopExtUtil::PlaySoundOnAllClients( name ) {
 	})
 }
 
+function PopExtUtil::EntFireOnAll(identifier, action, findBy = "name", param = "", delay = -1, activator = null, caller = null)
+{
+    local ent = null;
+    local findFunc = null;
+
+    if (findBy == "classname")
+    {
+        findFunc = @(startEnt) FindByClassname(startEnt, identifier);
+    }
+    else if (findBy == "targetname" || findBy == "name")
+    {
+        findFunc = @(startEnt) FindByName(startEnt, identifier);
+    }
+    else
+    {
+        PopExtMain.Error.RaiseValueError("EntFireOnAll", findBy, "Invalid findBy value. Use 'classname' or 'targetname'/'name'.");
+        return;
+    }
+
+    while ((ent = findFunc(ent)) != null)
+    {
+        EntFireByHandle(ent, action, param, delay, activator, caller);
+    }
+}
+
 function PopExtUtil::StopAndPlayMVMSound( player, soundscript, delay ) {
 
 	local scope = player.GetScriptScope()

@@ -46,27 +46,30 @@ if (!("TrueWave" in ROOT)) ::TrueWave <- null
 
 // Helper: Get True Wave
 function MissionAttributes::GetTrueWave() {
-    // If TrueWave is cached (during a spoofed wave), use it.
-    // If null (Intermission/Setup), read the live NetProp.
     if (::TrueWave != null) return ::TrueWave
-    return GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+    
+    ::TrueWave = GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+    return ::TrueWave
 }
 
 // 1. Reset on Round Start (Fixes Wave Jump)
+// At round start, any spoofs or animators are dead, so the NetProp is pure.
 POP_EVENT_HOOK("teamplay_round_start", "Global_WaveReset", function(params) {
-    ::TrueWave = null
+    ::TrueWave = GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
 }, 0)
 
 // 2. Reset on Wave Complete (FIXES NATURAL PROGRESSION PERSISTENCE)
-// This ensures that during the Setup of the NEXT wave, we read the real NetProp
-// instead of the stale TrueWave from the previous wave.
+// The engine advances the wave, but if an animator is running, the NetProp is corrupted.
+// We manually advance our TrueWave counter.
 POP_EVENT_HOOK("mvm_wave_complete", "Global_WaveEnd", function(params) {
-    ::TrueWave = null
+    if (::TrueWave != null) ::TrueWave += 1
 }, 0)
 
 // 3. Capture True Wave on Wave Start (Before WaveNum runs)
 POP_EVENT_HOOK("mvm_begin_wave", "Global_WaveTracker", function(params) {
-    ::TrueWave <- GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+    if (::TrueWave == null) {
+        ::TrueWave = GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+    }
 }, 0)
 
 // Cleanup hook - runs on EVERY round start FIRST
@@ -4238,8 +4241,7 @@ if ("CreatedWave" in ::SoundLoop) delete ::SoundLoop.CreatedWave // Removed in f
 // Helper: Get True Wave (Ignores WaveNum spoofing)
 // ----------------------------------------------------------------------------
 function MissionAttributes::SoundLoop_GetWave() {
-    if (::TrueWave != null) return ::TrueWave
-    return GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
+    return MissionAttributes.GetTrueWave()
 }
 
 // ----------------------------------------------------------------------------
@@ -4457,7 +4459,7 @@ MissionAttributes.Attrs.SoundLoop <- function(value) {
                 MissionAttributes.SoundLoop_Precache(raw)
                 list.append({
                     sound = raw,
-                    duration = ("Duration" in v) ? v.Duration.tofloat() : 60.0,
+                    duration = raw.tolower().find(".wav") != null ? -1.0 : (("Duration" in v) ? v.Duration.tofloat() : 60.0),
                     volume = ("Volume" in v) ? v.Volume.tofloat() : 1.0,
                     idx = k.tointeger()
                 })
@@ -4511,7 +4513,7 @@ MissionAttributes.Attrs.SoundLoop <- function(value) {
             }
         ", State.token, snd, vol), 0.1, null, null)
         
-        State.next_time = Time() + (track.duration > 0 ? track.duration : 60.0)
+        State.next_time = track.duration < 0 ? -1.0 : (Time() + (track.duration > 0 ? track.duration : 60.0))
     }
     
     scope.Think <- function() {
@@ -4528,7 +4530,7 @@ MissionAttributes.Attrs.SoundLoop <- function(value) {
             return
         }
         
-        if (Time() >= State.next_time) PlayNext()
+        if (State.next_time != -1.0 && Time() >= State.next_time) PlayNext()
         return 0.1
     }
     
